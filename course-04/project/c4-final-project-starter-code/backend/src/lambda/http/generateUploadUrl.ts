@@ -1,8 +1,10 @@
 import 'source-map-support/register'
-import * as AWS from 'aws-sdk'
+import * as AWS_SDK from 'aws-sdk'
+import * as AWSXRay from 'aws-xray-sdk'
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
 import { getUserId } from '../utils'
 
+const AWS = AWSXRay.captureAWS(AWS_SDK)
 const s3 = new AWS.S3({
   signatureVersion: 'v4' // Use Sigv4 algorithm
 })

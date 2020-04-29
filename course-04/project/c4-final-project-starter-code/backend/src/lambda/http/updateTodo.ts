@@ -1,9 +1,11 @@
+import * as AWS_SDK from 'aws-sdk'
+import * as AWSXRay from 'aws-xray-sdk'
+import { getUserId } from '../utils'
 import 'source-map-support/register'
-import * as AWS from 'aws-sdk'
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
-import { getUserId } from '../utils'
 
+const AWS = AWSXRay.captureAWS(AWS_SDK)
 const docClient = new AWS.DynamoDB.DocumentClient()
 const todosTable = process.env.TODOS_TABLE
 

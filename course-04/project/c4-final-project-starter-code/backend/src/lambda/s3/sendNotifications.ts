@@ -1,7 +1,9 @@
+import * as AWS_SDK from 'aws-sdk'
+import * as AWSXRay from 'aws-xray-sdk'
 import { S3Handler, S3Event } from 'aws-lambda'
 import 'source-map-support/register'
-import * as AWS  from 'aws-sdk'
 
+const AWS = AWSXRay.captureAWS(AWS_SDK)
 const docClient = new AWS.DynamoDB.DocumentClient()
 const todosTable = process.env.TODOS_TABLE
 const bucketName = process.env.IMAGES_S3_BUCKET
