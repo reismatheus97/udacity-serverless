@@ -9,17 +9,20 @@ const todosTable = process.env.TODOS_TABLE
 const bucketName = process.env.IMAGES_S3_BUCKET
 
 export const handler: S3Handler = async (event: S3Event) => {
+  console.log('Hello!!!!!')
   for (const record of event.Records) {
     const key = record.s3.object.key
     let attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${key}`
 
-    let todoId = key.split("___")[0]
-    let userId = key.split("___")[1]
+    let userId = key.split("___")[0]
+    let todoId = key.split("___")[1]
     userId = decodeURIComponent(userId)
+    console.log('userId >>', userId)
+    console.log('todoId >>', todoId)
     let params = {
       TableName: todosTable,
       Key: {
-        "userId": decodeURIComponent(userId),
+        "userId": userId,
         "todoId": todoId
       },
       UpdateExpression: "set attachmentUrl = :attachmentUrl",

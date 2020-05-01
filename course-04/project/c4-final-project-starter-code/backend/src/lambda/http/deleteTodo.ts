@@ -1,29 +1,16 @@
 import 'source-map-support/register'
-import * as AWS_SDK from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
-import { getUserId } from '../utils'
-
-const AWS = AWSXRay.captureAWS(AWS_SDK)
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
+import { deleteTodo } from '../../businessLogic/todos'
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const authorization = event.headers.Authorization
   const split = authorization.split(' ')
   const jwtToken = split[1]
-  const userId = getUserId(jwtToken)
   const todoId = event.pathParameters.todoId
   let statusCode, body = ''
 
   try {
-    await docClient.delete({
-      TableName: todosTable,
-      Key: {
-        "userId": userId,
-        "todoId": todoId
-      }
-    }).promise()
+    await deleteTodo(jwtToken, todoId)
     statusCode = 200
   } catch (error) {
     console.log(error)

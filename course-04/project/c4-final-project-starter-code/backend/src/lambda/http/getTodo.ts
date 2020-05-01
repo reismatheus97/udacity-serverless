@@ -1,35 +1,20 @@
 import 'source-map-support/register'
-import * as AWS_SDK from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
 
-const AWS = AWSXRay.captureAWS(AWS_SDK)
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
+import { getTodo } from '../../businessLogic/todos'
+
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Caller event', event)
 
-  const userId = 'dev-teste'
+  const authorization = event.headers.Authorization
+  const split = authorization.split(' ')
+  const jwtToken = split[1]
   const todoId = event.pathParameters.todoId
   let todo, statusCode;
 
-  async function getTodo (userId: string, todoId: string) {
-    const result = await docClient.query({
-      TableName: todosTable,
-      KeyConditionExpression: 'userId = :userId AND todoId = :todoId',
-      ExpressionAttributeValues: {
-        ':userId': userId,
-        ':todoId': todoId
-      },
-      ScanIndexForward: false
-    }).promise()
-
-    return result.Items
-  }
-
   try {
-    todo = await getTodo(userId, todoId)
+    todo = await getTodo(jwtToken, todoId)
     statusCode = 200
   } catch (error) {
     todo = error.message
